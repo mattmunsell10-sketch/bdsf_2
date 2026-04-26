@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bipolar Data Science Forum</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>&#x1F9E0;</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .hero{max-width:1240px;margin:0 auto;padding:4rem 2rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .hero-kicker{font-family:var(--mono);font-size:.67rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;display:block}
+    .hero h1{font-family:var(--serif);font-size:clamp(2.2rem,3.8vw,3.4rem);line-height:1.1;margin-bottom:1.1rem}
+    .hero h1 em{font-style:italic;color:var(--sky-mid)}
+    .hero-sub{font-size:1rem;color:var(--ink2);line-height:1.75;margin-bottom:2rem;max-width:44ch}
+    .hero-btns{display:flex;gap:.8rem;flex-wrap:wrap}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    /* research */
+    .research-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem}
+    .rc-meta{display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap}
+    .rc-type{font-family:var(--mono);font-size:.61rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .55rem;border-radius:4px;font-weight:500}
+    .type-neuro{background:var(--purple-light);color:var(--purple-dark)}
+    .type-behav{background:var(--teal-light);color:var(--teal-dark)}
+    .type-pharma{background:var(--amber-light);color:var(--amber-dark)}
+    .type-genetic{background:var(--sky);color:var(--sky-dark)}
+    .type-clinical{background:var(--pink-light);color:#72243e}
+    .rc-year{font-size:.74rem;color:var(--ink3);font-family:var(--mono)}
+    .rc-title{font-family:var(--serif);font-size:1.02rem;line-height:1.3;margin-bottom:.5rem;color:var(--ink)}
+    .rc-journal{font-size:.77rem;color:var(--ink3);margin-bottom:.7rem;font-style:italic}
+    .rc-excerpt{font-size:.84rem;color:var(--ink2);line-height:1.65;margin-bottom:.9rem}
+    .rc-link{font-size:.77rem;color:var(--sky-mid);font-weight:600;text-decoration:none}
+    .rc-link:hover{color:var(--sky-dark)}
+    a.card{text-decoration:none;color:inherit;display:block}
+    /* ds projects */
+    .ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem}
+    .ds-card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.4rem;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.75rem}
+    .ds-card:hover{border-color:var(--teal);transform:translateY(-2px)}
+    .ds-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .ds-author{font-size:.78rem;color:var(--ink3);font-family:var(--mono)}
+    .ds-status{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.22rem .55rem;border-radius:20px;white-space:nowrap;flex-shrink:0}
+    .status-active{background:var(--teal-light);color:var(--teal-dark)}
+    .status-complete{background:var(--sky);color:var(--sky-dark)}
+    .status-wip{background:var(--amber-light);color:var(--amber-dark)}
+    .status-seeking{background:var(--purple-light);color:var(--purple-dark)}
+    .ds-desc{font-size:.86rem;color:var(--ink2);line-height:1.65}
+    .ds-stack{display:flex;flex-wrap:wrap;gap:.4rem}
+    .ds-tag{font-family:var(--mono);font-size:.62rem;padding:.2rem .55rem;border-radius:4px;background:var(--page);border:1px solid var(--rule);color:var(--ink2)}
+    .ds-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid var(--rule);margin-top:auto}
+    .ds-links{display:flex;gap:.6rem}
+    .ds-link{font-size:.76rem;font-weight:600;text-decoration:none;color:var(--teal)}
+    .ds-link:hover{color:var(--teal-dark)}
+    .ds-link.github{color:var(--ink2)}
+    .ds-link.github:hover{color:var(--ink)}
+    .add-card{border:2px dashed var(--rule);background:transparent;justify-content:center;align-items:center;text-align:center;min-height:200px;cursor:pointer}
+    .add-card:hover{border-color:var(--teal);transform:translateY(-2px)}
+    .add-icon{width:44px;height:44px;background:var(--teal-light);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;font-size:22px;color:var(--teal-dark);font-weight:700}
+    .project-form{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.8rem;display:none;margin-top:1.5rem}
+    .project-form.open{display:block}
+    /* forum */
+    .forum-page{max-width:1240px;margin:0 auto;padding:3rem 2rem}
+    .forum-layout{display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start}
+    .forum-topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+    .sort-tabs{display:flex;gap:.2rem}
+    .sort-btn{font-size:.82rem;font-weight:500;color:var(--ink3);background:var(--surface);border:1px solid var(--rule);border-radius:20px;padding:.35rem .9rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .sort-btn:hover{border-color:var(--sky-mid);color:var(--sky-dark)}
+    .sort-btn.active{background:var(--sky-mid);border-color:var(--sky-mid);color:#fff}
+    .flair-filter{display:flex;gap:.4rem;flex-wrap:wrap}
+    .flair-btn{font-size:.72rem;font-weight:600;padding:.28rem .7rem;border-radius:20px;border:1px solid transparent;cursor:pointer;transition:all .15s}
+    .flair-btn:not(.active){opacity:.45}
+    .composer{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.2rem;margin-bottom:1.2rem}
+    .composer-row{display:flex;gap:.75rem;align-items:center;margin-bottom:.75rem}
+    .composer-box{flex:1;background:var(--page);border:1px solid var(--rule);border-radius:8px;padding:.65rem 1rem;font-family:var(--sans);font-size:.9rem;color:var(--ink);outline:none;transition:border-color .15s}
+    .composer-box:focus{border-color:var(--sky-mid)}
+    .composer-expand{display:none;flex-direction:column;gap:.75rem;margin-top:.75rem}
+    .composer-expand.open{display:flex}
+    .flair-picker{display:flex;gap:.4rem;flex-wrap:wrap}
+    .flair-pick{font-size:.72rem;font-weight:600;padding:.28rem .7rem;border-radius:20px;border:1px solid var(--rule);cursor:pointer;background:var(--surface);color:var(--ink2);transition:all .15s;font-family:var(--sans)}
+    .flair-pick.on{border-width:2px}
+    .auth-nudge{background:var(--sky);border-radius:8px;padding:.7rem 1rem;font-size:.84rem;color:var(--sky-dark)}
+    .auth-nudge a{font-weight:600;color:var(--sky-dark)}
+    .post-card{display:flex;gap:0;background:var(--surface);border:1px solid var(--rule);border-radius:12px;margin-bottom:.75rem;overflow:hidden;transition:border-color .2s}
+    .post-card:hover{border-color:var(--sky-mid)}
+    .vote-col{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.9rem .6rem;background:var(--page);min-width:52px;border-right:1px solid var(--rule)}
+    .vote-btn{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--ink3);line-height:1;padding:.1rem;transition:color .15s,transform .15s}
+    .vote-btn:hover{transform:scale(1.2)}
+    .vote-btn.up.voted{color:#e85d2a}
+    .vote-btn.down.voted{color:var(--sky-mid)}
+    .vote-count{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--ink);min-width:24px;text-align:center}
+    .post-body-col{flex:1;padding:1rem 1.1rem;min-width:0}
+    .post-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem}
+    .post-flair{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:4px}
+    .post-meta-top{font-size:.75rem;color:var(--ink3);font-family:var(--mono)}
+    .post-meta-top strong{color:var(--ink2);font-weight:600}
+    .post-badges{display:flex;gap:.3rem;flex-wrap:wrap}
+    .post-title{font-family:var(--serif);font-size:1.05rem;color:var(--ink);margin-bottom:.4rem;line-height:1.3;cursor:pointer}
+    .post-title:hover{color:var(--sky-dark)}
+    .post-preview{font-size:.86rem;color:var(--ink2);line-height:1.65;margin-bottom:.7rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .post-actions{display:flex;gap:.2rem;flex-wrap:wrap}
+    .post-action{font-size:.76rem;color:var(--ink3);background:none;border:none;cursor:pointer;padding:.3rem .65rem;border-radius:6px;display:flex;align-items:center;gap:.3rem;transition:background .15s,color .15s}
+    .post-action:hover{background:var(--page);color:var(--ink)}
+    /* thread modal */
+    .thread-overlay{display:none;position:fixed;inset:0;background:rgba(15,25,35,.6);z-index:300;overflow-y:auto;padding:2rem 1rem}
+    .thread-overlay.open{display:block}
+    .thread-modal{background:var(--surface);border-radius:14px;max-width:780px;margin:0 auto;overflow:hidden}
+    .thread-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;border-bottom:1px solid var(--rule)}
+    .thread-close{background:none;border:none;font-size:1.4rem;color:var(--ink3);cursor:pointer}
+    .thread-body{padding:1.2rem}
+    .thread-post{display:flex;gap:1rem;margin-bottom:1.5rem}
+    .thread-vote{display:flex;flex-direction:column;align-items:center;gap:.2rem;flex-shrink:0}
+    .thread-content{flex:1}
+    .thread-title{font-family:var(--serif);font-size:1.3rem;line-height:1.25;margin-bottom:.75rem}
+    .thread-text{font-size:.92rem;color:var(--ink2);line-height:1.75;margin-bottom:1rem}
+    .thread-divider{border:none;border-top:1px solid var(--rule);margin:1.2rem 0}
+    .comments-label{font-size:.8rem;font-weight:600;color:var(--ink2);margin-bottom:.8rem;letter-spacing:.04em}
+    .comment-composer{display:flex;gap:.75rem;margin-bottom:1.2rem}
+    .comment-input{flex:1;background:var(--page);border:1px solid var(--rule);border-radius:8px;padding:.6rem .9rem;font-family:var(--sans);font-size:.87rem;color:var(--ink);outline:none;resize:vertical;min-height:70px;transition:border-color .15s}
+    .comment-input:focus{border-color:var(--sky-mid)}
+    .comment-list{display:flex;flex-direction:column;gap:.75rem}
+    .comment-item{display:flex;gap:.75rem}
+    .comment-body{flex:1;background:var(--page);border-radius:8px;padding:.75rem 1rem}
+    .comment-meta{font-size:.75rem;color:var(--ink3);font-family:var(--mono);margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .comment-meta strong{color:var(--ink2)}
+    .comment-text{font-size:.87rem;color:var(--ink2);line-height:1.65}
+    .comment-actions{display:flex;gap:.5rem;margin-top:.5rem}
+    .comment-action{font-size:.72rem;color:var(--ink3);background:none;border:none;cursor:pointer;padding:.2rem .4rem;border-radius:4px;transition:background .15s}
+    .comment-action:hover{background:var(--rule);color:var(--ink)}
+    /* sidebar */
+    .sidebar-widget{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.2rem;margin-bottom:1rem}
+    .sw-title{font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:1rem}
+    .trending-item{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--rule);font-size:.82rem}
+    .trending-item:last-child{border-bottom:none}
+    .trending-topic{color:var(--sky-dark);font-weight:500;cursor:pointer}
+    .trending-count{font-family:var(--mono);font-size:.7rem;color:var(--ink3)}
+    .legend-item{display:flex;align-items:center;gap:.6rem;padding:.28rem 0;font-size:.8rem;color:var(--ink2)}
+    .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+    .rules-list{list-style:none;counter-reset:rules}
+    .rules-list li{counter-increment:rules;display:flex;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--rule);font-size:.82rem;color:var(--ink2)}
+    .rules-list li:last-child{border-bottom:none}
+    .rules-list li::before{content:counter(rules);font-family:var(--mono);font-size:.7rem;color:var(--ink3);flex-shrink:0;padding-top:.1rem}
+    .crisis-box{background:var(--pink-light);border:1px solid #f4c0d1;border-radius:10px;padding:1rem}
+    .crisis-box .ctitle{font-size:.8rem;font-weight:600;color:#72243e;margin-bottom:.4rem}
+    .crisis-box p{font-size:.75rem;color:#993556;line-height:1.6;margin-bottom:.7rem}
+    .crisis-box a{font-size:.78rem;font-weight:600;color:#72243e;text-decoration:none;display:block;margin-bottom:.3rem}
+    /* flair colors */
+    .flair-science{background:#EDE9FE;color:#3C3489}
+    .flair-lived{background:#E1F5EE;color:#085041}
+    .flair-treatment{background:#FAEEDA;color:#633806}
+    .flair-data{background:#EAF3DE;color:#173404}
+    .flair-genetics{background:#EAF4FB;color:#0C447C}
+    .flair-news{background:#fbeaf0;color:#72243e}
+    .flair-question{background:#F3F0FF;color:#534AB7}
+    .flair-support{background:#FFF8E6;color:#7A4800}
+    /* about */
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    .about-body p{font-size:.96rem;color:var(--ink2);line-height:1.8;margin-bottom:1rem}
+    .values-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .value-card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:1.1rem}
+    .v-icon{width:32px;height:32px;border-radius:8px;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem}
+    .value-card h4{font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:.3rem}
+    .value-card p{font-size:.78rem;color:var(--ink2);line-height:1.6}
+    /* footer */
+    footer{background:var(--ink);color:#b0bec8;padding:3rem 2rem}
+    .footer-inner{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem}
+    .footer-brand{font-family:var(--serif);font-size:1.05rem;color:#fff;margin-bottom:.5rem}
+    .footer-tagline{font-size:.82rem;line-height:1.65;max-width:28ch}
+    .footer-col-title{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#7a8d9e;margin-bottom:.8rem}
+    .footer-col a{display:block;font-size:.82rem;color:#b0bec8;text-decoration:none;margin-bottom:.4rem;transition:color .15s}
+    .footer-col a:hover{color:#fff}
+    .footer-bottom{max-width:1240px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid #1e2d3a;display:flex;justify-content:space-between;font-size:.74rem;color:#4a6070}
+    /* states */
+    .empty-card{background:var(--surface);border:2px dashed var(--rule);border-radius:12px;padding:3rem 2rem;text-align:center;color:var(--ink3)}
+    .empty-card h3{font-family:var(--serif);font-size:1.2rem;color:var(--ink);margin-bottom:.5rem}
+    .empty-card p{font-size:.88rem;line-height:1.65;max-width:36ch;margin:0 auto .8rem}
+    .loading-state{text-align:center;padding:3rem}
+    @media(max-width:900px){.hero,.forum-layout,.about-grid{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.footer-inner,.values-grid,.hero-stats{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Bipolar Data Science Forum<span>Science &middot; Community &middot; Lived Experience</span></a>
+    <nav>
+      <a href="#forum">Forum</a>
+      <a href="#research">Research</a>
+      <a href="#projects">DS Projects</a>
+      <a href="#about">About</a>
+      <a href="pages/profile.html">Profile</a>
+    </nav>
+    <div id="nav-signin">
+      <a href="pages/login.html" class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="pages/signup.html" class="btn btn-primary btn-sm">Join</a>
+    </div>
+    <div id="nav-user-area">
+      <a href="pages/profile.html" style="text-decoration:none;display:flex;align-items:center;gap:.5rem">
+        <div class="nav-avatar"><span id="nav-avatar-initial">?</span></div>
+        <span id="nav-display-name"></span>
+      </a>
+      <button class="nav-signout-btn" onclick="auth.signOut()">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="fade-up">
+    <span class="hero-kicker">Neuroscience &middot; Data Science &middot; Lived Experience</span>
+    <h1>Where data science<br>meets <em>bipolar disorder</em></h1>
+    <p class="hero-sub">A peer community, research hub, and open project space built by people with bipolar disorder. Experts and lived experience welcome equally.</p>
+    <div class="hero-btns">
+      <a href="#forum" class="btn btn-primary">Enter the Forum</a>
+      <a href="#research" class="btn btn-outline">Research Library</a>
+      <a href="#projects" class="btn btn-teal">DS Projects</a>
+    </div>
+  </div>
+  <div class="fade-up" style="animation-delay:.15s">
+    <div class="hero-stats">
+      <div class="stat-card"><span class="stat-num">2.8%</span><span class="stat-label">Global prevalence</span></div>
+      <div class="stat-card"><span class="stat-num">6 yrs</span><span class="stat-label">Avg. to diagnosis</span></div>
+      <div class="stat-card"><span class="stat-num">Open</span><span class="stat-label">Always free</span></div>
+      <div class="stat-card"><span class="stat-num">BD I+II</span><span class="stat-label">Both types</span></div>
+      <div class="stat-card"><span class="stat-num">Peer</span><span class="stat-label">Led community</span></div>
+      <div class="stat-card"><span class="stat-num">&#x1F9E0;</span><span class="stat-label">Science-grounded</span></div>
+    </div>
+  </div>
+</div>
+<hr class="section-divider">
+
+<!-- FORUM -->
+<div class="forum-page" id="forum">
+  <span class="kicker" style="color:var(--purple)">Community Forum</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.3rem);margin-bottom:.4rem">The Forum</h2>
+  <p style="font-size:.93rem;color:var(--ink2);margin-bottom:2rem;max-width:62ch;line-height:1.7">Discuss research, share data science work, ask questions, and make sense of this disorder together. Experts and lived experience are equally valued here.</p>
+
+  <div class="forum-layout">
+    <div>
+      <!-- composer -->
+      <div class="composer">
+        <div class="composer-row">
+          <div class="avatar" style="background:var(--sky);color:var(--sky-dark)" id="composer-av">?</div>
+          <input class="composer-box" id="post-title-input" placeholder="Start a discussion, share a study, ask a question..." onfocus="expandComposer()" autocomplete="off">
+        </div>
+        <div class="composer-expand" id="composer-expand">
+          <div id="forum-auth-nudge" class="auth-nudge" style="display:none">
+            <a href="pages/login.html">Sign in</a> or <a href="pages/signup.html">join free</a> to post. Your profile badges appear automatically on every post.
+          </div>
+          <textarea class="composer-box" id="post-body-input" placeholder="Write your full post here... share context, cite a study, describe your experience." style="min-height:100px;resize:vertical"></textarea>
+          <div>
+            <p style="font-size:.75rem;color:var(--ink3);margin-bottom:.5rem">Choose a flair (topic tag):</p>
+            <div class="flair-picker" id="flair-picker">
+              <button class="flair-pick flair-science" data-flair="Science Discussion">&#x1F52C; Science Discussion</button>
+              <button class="flair-pick flair-lived" data-flair="Lived Experience">&#x1F4AC; Lived Experience</button>
+              <button class="flair-pick flair-treatment" data-flair="Treatment">&#x1F48A; Treatment</button>
+              <button class="flair-pick flair-data" data-flair="Data Science">&#x1F4CA; Data Science</button>
+              <button class="flair-pick flair-genetics" data-flair="Genetics">&#x1F9EC; Genetics</button>
+              <button class="flair-pick flair-news" data-flair="Research News">&#x1F4F0; Research News</button>
+              <button class="flair-pick flair-question" data-flair="Question">&#x2753; Question</button>
+              <button class="flair-pick flair-support" data-flair="Support">&#x1F91D; Support</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:center">
+            <button class="btn btn-primary btn-sm" onclick="submitPost()">Post</button>
+            <button class="btn btn-ghost btn-sm" onclick="collapseComposer()">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <!-- sort bar -->
+      <div class="forum-topbar">
+        <div class="sort-tabs">
+          <button class="sort-btn active" onclick="setSort('hot',this)">&#x1F525; Hot</button>
+          <button class="sort-btn" onclick="setSort('new',this)">&#x2728; New</button>
+          <button class="sort-btn" onclick="setSort('top',this)">&#x2B06;&#xFE0F; Top</button>
+        </div>
+        <div class="flair-filter" id="flair-filter">
+          <button class="flair-btn flair-science active" data-flair="Science Discussion" onclick="filterFlair(this)">&#x1F52C; Science</button>
+          <button class="flair-btn flair-lived active" data-flair="Lived Experience" onclick="filterFlair(this)">&#x1F4AC; Lived</button>
+          <button class="flair-btn flair-treatment active" data-flair="Treatment" onclick="filterFlair(this)">&#x1F48A; Treatment</button>
+          <button class="flair-btn flair-data active" data-flair="Data Science" onclick="filterFlair(this)">&#x1F4CA; Data</button>
+          <button class="flair-btn flair-genetics active" data-flair="Genetics" onclick="filterFlair(this)">&#x1F9EC; Genetics</button>
+          <button class="flair-btn flair-news active" data-flair="Research News" onclick="filterFlair(this)">&#x1F4F0; News</button>
+          <button class="flair-btn flair-question active" data-flair="Question" onclick="filterFlair(this)">&#x2753; Q&amp;A</button>
+          <button class="flair-btn flair-support active" data-flair="Support" onclick="filterFlair(this)">&#x1F91D; Support</button>
+        </div>
+      </div>
+      <div id="posts-container"><div class="loading-state"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- sidebar -->
+    <div>
+      <div class="sidebar-widget" style="border-color:var(--sky-mid)">
+        <p class="sw-title">About this forum</p>
+        <p style="font-size:.84rem;color:var(--ink2);line-height:1.65;margin-bottom:1rem">A science-grounded peer community for people with bipolar disorder, their families, clinicians, and researchers. Lived experience and expertise are equally valued here.</p>
+        <a href="pages/signup.html" class="btn btn-primary btn-sm" style="display:block;text-align:center;text-decoration:none">Join the community</a>
+      </div>
+      <div class="sidebar-widget">
+        <p class="sw-title">Forum rules</p>
+        <ul class="rules-list">
+          <li>Be kind. Critique ideas, not people.</li>
+          <li>Cite sources for scientific claims.</li>
+          <li>Lived experience is valid evidence.</li>
+          <li>No medical advice. Share, don't prescribe.</li>
+          <li>Respect privacy &mdash; your own and others'.</li>
+          <li>No promotion or spam.</li>
+        </ul>
+      </div>
+      <div class="sidebar-widget">
+        <p class="sw-title">Active topics</p>
+        <div id="trending-list">
+          <div class="trending-item"><span class="trending-topic">#wearables</span><span class="trending-count">&mdash;</span></div>
+          <div class="trending-item"><span class="trending-topic">#sleep</span><span class="trending-count">&mdash;</span></div>
+          <div class="trending-item"><span class="trending-topic">#ketamine</span><span class="trending-count">&mdash;</span></div>
+          <div class="trending-item"><span class="trending-topic">#circadian</span><span class="trending-count">&mdash;</span></div>
+          <div class="trending-item"><span class="trending-topic">#genetics</span><span class="trending-count">&mdash;</span></div>
+        </div>
+      </div>
+      <div class="sidebar-widget">
+        <p class="sw-title">Badge guide</p>
+        <div class="legend-item"><div class="legend-dot" style="background:#B5D4F4"></div>Profession</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#CECBF6"></div>Research role</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C0DD97"></div>Data Scientist / ML</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9FE1CB"></div>Lived experience</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#FAC775"></div>Caregiver / family</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F4C0D1"></div>Diagnosed</div>
+        <p style="font-size:.75rem;color:var(--ink3);margin-top:.8rem">Set your badges on your <a href="pages/profile.html" style="color:var(--sky-mid)">profile page</a>.</p>
+      </div>
+      <div class="crisis-box">
+        <p class="ctitle">Need support now?</p>
+        <p>If you are in crisis, please reach out. You are not alone.</p>
+        <a href="https://988lifeline.org" target="_blank">988 Suicide &amp; Crisis Lifeline &#x2192;</a>
+        <a href="https://www.dbsalliance.org" target="_blank">DBSA Helpline &#x2192;</a>
+        <a href="https://www.nami.org/help" target="_blank">NAMI Helpline &#x2192;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THREAD MODAL -->
+<div class="thread-overlay" id="thread-overlay" onclick="closeThreadIfBg(event)">
+  <div class="thread-modal" id="thread-modal">
+    <div class="thread-header">
+      <span id="thread-flair-label"></span>
+      <button class="thread-close" onclick="closeThread()">&#x2715;</button>
+    </div>
+    <div class="thread-body">
+      <div class="thread-post">
+        <div class="thread-vote">
+          <button class="vote-btn up" id="tv-up" onclick="threadVote(1)">&#x25B2;</button>
+          <span class="vote-count" id="tv-count">0</span>
+          <button class="vote-btn down" id="tv-down" onclick="threadVote(-1)">&#x25BC;</button>
+        </div>
+        <div class="thread-content">
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem">
+            <div class="avatar" id="tv-avatar" style="width:28px;height:28px;font-size:.7rem;background:var(--sky);color:var(--sky-dark)">?</div>
+            <span style="font-size:.9rem;font-weight:600" id="tv-author"></span>
+            <div id="tv-badges" class="post-badges"></div>
+            <span style="font-size:.74rem;color:var(--ink3);font-family:var(--mono)" id="tv-time"></span>
+          </div>
+          <h2 class="thread-title" id="tv-title"></h2>
+          <p class="thread-text" id="tv-body"></p>
+        </div>
+      </div>
+      <hr class="thread-divider">
+      <p class="comments-label" id="comments-label">Comments</p>
+      <div class="comment-composer">
+        <div class="avatar" id="comment-av" style="background:var(--sky);color:var(--sky-dark);width:32px;height:32px;font-size:.75rem;flex-shrink:0">?</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:.5rem">
+          <textarea class="comment-input" id="comment-input" placeholder="Add a comment..."></textarea>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="submitComment()">Comment</button>
+        </div>
+      </div>
+      <div class="comment-list" id="comment-list"><div class="loading-state"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- RESEARCH -->
+<div class="section" id="research">
+  <span class="kicker" style="color:var(--teal)">Research Library</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.3rem);margin-bottom:.5rem">Neuroscience &amp; Behavioral Science</h2>
+  <p style="font-size:.93rem;color:var(--ink2);margin-bottom:2.5rem;max-width:62ch;line-height:1.7">Peer-reviewed studies selected for relevance to people living with bipolar disorder. Post a study link in the forum with the Research News flair to suggest additions.</p>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="filterResearch('all',this)">All</button>
+    <button class="tab-btn" onclick="filterResearch('neuro',this)">Neuroscience</button>
+    <button class="tab-btn" onclick="filterResearch('behav',this)">Behavioral</button>
+    <button class="tab-btn" onclick="filterResearch('pharma',this)">Treatment</button>
+    <button class="tab-btn" onclick="filterResearch('genetic',this)">Genetics</button>
+    <button class="tab-btn" onclick="filterResearch('clinical',this)">Clinical</button>
+  </div>
+  <div class="research-grid" id="research-grid">
+    <div class="empty-card">
+      <div style="font-size:2rem;margin-bottom:.75rem">&#x1F4C4;</div>
+      <h3>No studies added yet</h3>
+      <p>Be the first to submit a research study. Post a link in the forum with the Research News flair and we will add it to the library.</p>
+      <a href="#forum" class="btn btn-outline btn-sm" style="display:inline-block;margin-top:.5rem">Go to forum &#x2192;</a>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- DS PROJECTS -->
+<div class="section" id="projects">
+  <span class="kicker" style="color:var(--teal)">Open Projects</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.3rem);margin-bottom:.5rem">Data Science Projects</h2>
+  <p style="font-size:.93rem;color:var(--ink2);margin-bottom:2.5rem;max-width:62ch;line-height:1.7">Community-built analyses, models, and datasets applying data science to bipolar disorder. Submit your own project to appear here.</p>
+  <div class="ds-grid" id="ds-grid">
+    <div class="empty-card" id="proj-placeholder">
+      <div style="font-size:2rem;margin-bottom:.75rem">&#x1F4CA;</div>
+      <h3>No projects yet</h3>
+      <p>Submit the first data science project &mdash; an analysis, model, dataset, or idea. Sign in to get started.</p>
+    </div>
+    <div class="ds-card add-card" onclick="toggleProjectForm()">
+      <div class="add-icon">+</div>
+      <h3 style="font-size:1rem;margin-bottom:.4rem;font-family:var(--serif)">Submit your project</h3>
+      <p style="font-size:.82rem;color:var(--ink3);max-width:24ch;margin:0 auto">Share an analysis, model, dataset, or idea</p>
+    </div>
+  </div>
+  <div class="project-form" id="project-form">
+    <h3 style="font-family:var(--serif);font-size:1.2rem;margin-bottom:1.2rem">Submit a project</h3>
+    <div id="proj-auth-msg" class="auth-nudge" style="display:none;margin-bottom:1rem"><a href="pages/login.html">Sign in</a> to submit a project.</div>
+    <div id="proj-form-fields">
+      <div class="form-grid">
+        <div class="form-field"><label class="form-label">Project title</label><input class="form-input" id="proj-title" placeholder="What did you build?"></div>
+        <div class="form-field"><label class="form-label">Status</label>
+          <select class="form-select" id="proj-status">
+            <option value="wip">In Progress</option>
+            <option value="active">Active / Seeking Collaborators</option>
+            <option value="complete">Complete</option>
+            <option value="seeking">Seeking Data / Contributions</option>
+          </select>
+        </div>
+        <div class="form-field"><label class="form-label">GitHub URL (optional)</label><input class="form-input" id="proj-github" placeholder="https://github.com/..."></div>
+        <div class="form-field"><label class="form-label">Tools (comma separated)</label><input class="form-input" id="proj-tags" placeholder="Python, pandas, scikit-learn"></div>
+        <div class="form-field full"><label class="form-label">Description</label><textarea class="form-textarea" id="proj-desc" placeholder="What does the project do? What data, what methods, what have you found so far?"></textarea></div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:.5rem">
+        <button class="btn btn-teal" onclick="submitProject()">Add project</button>
+        <button class="btn btn-ghost" onclick="toggleProjectForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ABOUT -->
+<div class="section" id="about">
+  <span class="kicker" style="color:var(--amber)">Our Mission</span>
+  <h2 style="font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.3rem);margin-bottom:.5rem">Why this space exists</h2>
+  <div class="about-grid">
+    <div class="about-body">
+      <p>Most research on bipolar disorder is written <em>about</em> us, not <em>for</em> us or <em>by</em> us. Academic papers sit behind paywalls. Clinical language creates distance. And the lived knowledge of millions of people navigating this disorder daily is rarely treated as expertise.</p>
+      <p>The Bipolar Data Science Forum adds something new: a place where people with bipolar disorder can also be the <em>builders</em> &mdash; applying data science to their own minds, sharing code and datasets, and producing analyses that academic researchers cannot, because they do not live it.</p>
+      <p>We hold space for complexity. Science and suffering coexist here.</p>
+    </div>
+    <div class="values-grid">
+      <div class="value-card"><div class="v-icon" style="background:var(--sky)">&#x1F50D;</div><h4>Science first</h4><p>Cite sources when making claims. Primary literature, not pop summaries.</p></div>
+      <div class="value-card"><div class="v-icon" style="background:var(--teal-light)">&#x1F4CA;</div><h4>Data by us</h4><p>Community-built projects. People with BD as researchers, not just subjects.</p></div>
+      <div class="value-card"><div class="v-icon" style="background:var(--purple-light)">&#x1F513;</div><h4>Always free</h4><p>No paywalls, no ads. Research and community are permanently open.</p></div>
+      <div class="value-card"><div class="v-icon" style="background:var(--amber-light)">&#x2696;&#xFE0F;</div><h4>Honest complexity</h4><p>We do not sanitize the difficulty. Hope and hardship are both welcome.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Bipolar Data Science Forum</p>
+      <p class="footer-tagline">Science &middot; Community &middot; Lived Experience. Open to all, built by people who understand.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Forum</p>
+      <a href="#forum">All Posts</a>
+      <a href="#forum">Science Discussion</a>
+      <a href="#forum">Lived Experience</a>
+      <a href="#forum">Data Science</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Projects</p>
+      <a href="#projects">All Projects</a>
+      <a href="#projects">Submit a Project</a>
+      <a href="#research">Research Library</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Resources</p>
+      <a href="https://www.dbsalliance.org" target="_blank">DBSA</a>
+      <a href="https://www.nami.org" target="_blank">NAMI</a>
+      <a href="https://988lifeline.org" target="_blank">988 Lifeline</a>
+      <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank">PubMed</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Bipolar Data Science Forum. Not a substitute for professional medical advice.</span>
+    <span>Built with care by people who understand.</span>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script>
+var currentSort='hot',activeFlair=new Set(['Science Discussion','Lived Experience','Treatment','Data Science','Genetics','Research News','Question','Support']),selectedFlair=null,currentUser=null,userBadges=[],openPostId=null,cachedPosts=[],threadVoteDir=0;
+var FLAIR_CLASS={'Science Discussion':'flair-science','Lived Experience':'flair-lived','Treatment':'flair-treatment','Data Science':'flair-data','Genetics':'flair-genetics','Research News':'flair-news','Question':'flair-question','Support':'flair-support'};
+var AV=[{bg:'var(--sky)',fg:'var(--sky-dark)'},{bg:'var(--teal-light)',fg:'var(--teal-dark)'},{bg:'var(--purple-light)',fg:'var(--purple-dark)'},{bg:'var(--amber-light)',fg:'var(--amber-dark)'},{bg:'var(--green-light)',fg:'var(--green-dark)'}];
+function uidColor(u){return AV[Math.abs((u||'').charCodeAt(0)||0)%AV.length]}
+
+auth.onAuthStateChanged(async function(user){
+  currentUser=user;
+  var av=document.getElementById('composer-av'),nudge=document.getElementById('forum-auth-nudge'),cav=document.getElementById('comment-av');
+  if(user){
+    var init=(user.displayName||user.email||'?')[0].toUpperCase();
+    if(av)av.textContent=init; if(cav)cav.textContent=init; if(nudge)nudge.style.display='none';
+    try{var doc=await db.collection('users').doc(user.uid).get();if(doc.exists)userBadges=doc.data().badges||[];}catch(e){}
+  } else {
+    if(av)av.textContent='?'; if(cav)cav.textContent='?'; if(nudge)nudge.style.display='block';
+  }
+});
+
+function expandComposer(){document.getElementById('composer-expand').classList.add('open')}
+function collapseComposer(){document.getElementById('composer-expand').classList.remove('open');document.getElementById('post-title-input').value='';document.getElementById('post-body-input').value='';selectedFlair=null;document.querySelectorAll('.flair-pick').forEach(function(b){b.classList.remove('on')})}
+document.querySelectorAll('.flair-pick').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.flair-pick').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');selectedFlair=btn.dataset.flair})});
+
+async function submitPost(){
+  if(!currentUser){showToast('Please sign in to post.');return;}
+  var title=document.getElementById('post-title-input').value.trim(),body=document.getElementById('post-body-input').value.trim();
+  if(!title){showToast('Please add a title.');return;}
+  await db.collection('posts').add({title:title,body:body,flair:selectedFlair||'Science Discussion',authorId:currentUser.uid,authorName:currentUser.displayName||currentUser.email,badges:userBadges,votes:1,commentCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  collapseComposer();showToast('Posted! \u2713');
+}
+
+function setSort(sort,btn){currentSort=sort;document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');loadPosts()}
+function filterFlair(btn){var f=btn.dataset.flair;if(btn.classList.toggle('active'))activeFlair.add(f);else activeFlair.delete(f);renderPosts(cachedPosts)}
+
+function loadPosts(){
+  document.getElementById('posts-container').innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
+  var q=db.collection('posts').orderBy('createdAt','desc').limit(60);
+  if(currentSort==='top')q=db.collection('posts').orderBy('votes','desc').limit(60);
+  q.onSnapshot(function(snap){
+    cachedPosts=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+    if(currentSort==='hot')cachedPosts.sort(function(a,b){return hotScore(b)-hotScore(a)});
+    renderPosts(cachedPosts);
+  });
+}
+function hotScore(p){var v=p.votes||1,age=p.createdAt?(Date.now()-p.createdAt.toDate().getTime())/3600000:1;return v/Math.pow(age+2,1.5)}
+
+function renderPosts(posts){
+  var c=document.getElementById('posts-container');
+  var visible=posts.filter(function(p){return activeFlair.size===0||activeFlair.has(p.flair)});
+  if(!visible.length){c.innerHTML='<div class="empty-card"><div style="font-size:2rem;margin-bottom:.75rem">&#x1F4AC;</div><h3>No posts yet</h3><p>Be the first to start a discussion using the composer above.</p>'+((!currentUser)?'<a href="pages/signup.html" class="btn btn-primary btn-sm" style="display:inline-block;margin-top:.5rem">Join to post</a>':'')+'</div>';return;}
+  c.innerHTML=visible.map(buildPostCard).join('');
+}
+
+function buildPostCard(p){
+  var col=uidColor(p.authorId),init=(p.authorName||'?')[0].toUpperCase(),fc=FLAIR_CLASS[p.flair]||'flair-science',badges=renderBadges(p.badges||[]),preview=(p.body||'').substring(0,200)+((p.body||'').length>200?'\u2026':''),comments=p.commentCount||0;
+  return '<div class="post-card" id="pc-'+p.id+'"><div class="vote-col"><button class="vote-btn up" onclick="vote(event,\''+p.id+'\',1)">&#x25B2;</button><span class="vote-count" id="vc-'+p.id+'">'+(p.votes||0)+'</span><button class="vote-btn down" onclick="vote(event,\''+p.id+'\',-1)">&#x25BC;</button></div><div class="post-body-col"><div class="post-top"><span class="post-flair '+fc+'">'+(p.flair||'')+'</span><span class="post-meta-top"><strong>'+(p.authorName||'Anonymous')+'</strong> &middot; '+timeAgo(p.createdAt)+'</span>'+(badges?'<div class="post-badges">'+badges+'</div>':'')+'</div><h3 class="post-title" onclick="openThread(\''+p.id+'\')">'+(p.title||'')+'</h3>'+(preview?'<p class="post-preview">'+preview+'</p>':'')+'<div class="post-actions"><button class="post-action" onclick="openThread(\''+p.id+'\')">&#x1F4AC; '+comments+' comment'+(comments!==1?'s':'')+'</button><button class="post-action" onclick="copyLink(\''+p.id+'\')">&#x1F517; Share</button><button class="post-action" onclick="savePost(\''+p.id+'\')">&#x1F516; Save</button></div></div></div>';
+}
+
+var votedPosts=new Set(JSON.parse(localStorage.getItem('voted')||'[]'));
+async function vote(e,postId,dir){e.stopPropagation();if(!currentUser){showToast('Sign in to vote.');return;}if(votedPosts.has(postId)){showToast('Already voted.');return;}votedPosts.add(postId);localStorage.setItem('voted',JSON.stringify([...votedPosts]));var el=document.getElementById('vc-'+postId);if(el)el.textContent=parseInt(el.textContent)+dir;await db.collection('posts').doc(postId).update({votes:firebase.firestore.FieldValue.increment(dir)})}
+
+async function openThread(postId){
+  openPostId=postId;document.getElementById('thread-overlay').classList.add('open');document.body.style.overflow='hidden';
+  var post=cachedPosts.find(function(p){return p.id===postId});if(!post)return;
+  var col=uidColor(post.authorId),init=(post.authorName||'?')[0].toUpperCase(),fc=FLAIR_CLASS[post.flair]||'flair-science';
+  document.getElementById('thread-flair-label').innerHTML='<span class="post-flair '+fc+'">'+(post.flair||'')+'</span>';
+  document.getElementById('tv-title').textContent=post.title||'';
+  document.getElementById('tv-body').textContent=post.body||'';
+  document.getElementById('tv-count').textContent=post.votes||0;
+  document.getElementById('tv-author').textContent=post.authorName||'Anonymous';
+  document.getElementById('tv-time').textContent=timeAgo(post.createdAt);
+  document.getElementById('tv-badges').innerHTML=renderBadges(post.badges||[]);
+  var av=document.getElementById('tv-avatar');av.textContent=init;av.style.background=col.bg;av.style.color=col.fg;
+  threadVoteDir=0;document.getElementById('tv-up').classList.remove('voted');document.getElementById('tv-down').classList.remove('voted');
+  loadComments(postId);
+}
+function closeThread(){document.getElementById('thread-overlay').classList.remove('open');document.body.style.overflow='';openPostId=null}
+function closeThreadIfBg(e){if(e.target===document.getElementById('thread-overlay'))closeThread()}
+
+function loadComments(postId){
+  var list=document.getElementById('comment-list'),label=document.getElementById('comments-label');
+  list.innerHTML='<div class="loading-state"><div class="spinner"></div></div>';
+  db.collection('posts').doc(postId).collection('comments').orderBy('createdAt','asc').onSnapshot(function(snap){
+    label.textContent=snap.size+' Comment'+(snap.size!==1?'s':'');
+    if(snap.empty){list.innerHTML='<p style="font-size:.86rem;color:var(--ink3);text-align:center;padding:1.5rem">No comments yet &mdash; start the discussion.</p>';return;}
+    list.innerHTML=snap.docs.map(function(doc){
+      var c=doc.data(),col=uidColor(c.authorId),init=(c.authorName||'?')[0].toUpperCase();
+      return '<div class="comment-item"><div class="avatar" style="background:'+col.bg+';color:'+col.fg+';width:30px;height:30px;font-size:.72rem;flex-shrink:0">'+init+'</div><div class="comment-body"><div class="comment-meta"><strong>'+(c.authorName||'Anonymous')+'</strong>'+renderBadges(c.badges||[])+'<span>'+timeAgo(c.createdAt)+'</span></div><p class="comment-text">'+(c.body||'')+'</p><div class="comment-actions"><button class="comment-action">&#x25B2; '+(c.votes||0)+'</button></div></div></div>';
+    }).join('');
+  });
+}
+
+async function submitComment(){
+  if(!currentUser){showToast('Sign in to comment.');return;}
+  var input=document.getElementById('comment-input'),body=input.value.trim();
+  if(!body){showToast('Write something first.');return;}
+  if(!openPostId)return;
+  await db.collection('posts').doc(openPostId).collection('comments').add({body:body,authorId:currentUser.uid,authorName:currentUser.displayName||currentUser.email,badges:userBadges,votes:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('posts').doc(openPostId).update({commentCount:firebase.firestore.FieldValue.increment(1)});
+  input.value='';
+}
+
+function threadVote(dir){
+  if(!currentUser){showToast('Sign in to vote.');return;}
+  var counter=document.getElementById('tv-count'),cur=parseInt(counter.textContent);
+  var upBtn=document.getElementById('tv-up'),downBtn=document.getElementById('tv-down');
+  if(threadVoteDir===dir){counter.textContent=cur-dir;upBtn.classList.remove('voted');downBtn.classList.remove('voted');threadVoteDir=0;}
+  else{counter.textContent=cur+dir-threadVoteDir;upBtn.classList.toggle('voted',dir===1);downBtn.classList.toggle('voted',dir===-1);threadVoteDir=dir;if(openPostId)db.collection('posts').doc(openPostId).update({votes:firebase.firestore.FieldValue.increment(dir)});}
+}
+
+function filterResearch(cat,btn){document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');document.querySelectorAll('#research-grid .card[data-cat]').forEach(function(c){c.style.display=(cat==='all'||c.dataset.cat===cat)?'block':'none'})}
+
+function toggleProjectForm(){
+  var f=document.getElementById('project-form'),open=f.classList.toggle('open'),msg=document.getElementById('proj-auth-msg'),flds=document.getElementById('proj-form-fields');
+  if(open){if(!currentUser){msg.style.display='block';flds.style.opacity='.4';flds.style.pointerEvents='none';}else{msg.style.display='none';flds.style.opacity='1';flds.style.pointerEvents='auto';}f.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+async function submitProject(){
+  if(!currentUser){showToast('Please sign in first.');return;}
+  var title=document.getElementById('proj-title').value.trim(),desc=document.getElementById('proj-desc').value.trim();
+  var tags=document.getElementById('proj-tags').value.split(',').map(function(t){return t.trim()}).filter(Boolean);
+  var github=document.getElementById('proj-github').value.trim(),status=document.getElementById('proj-status').value;
+  if(!title||!desc){showToast('Title and description required.');return;}
+  await db.collection('projects').add({title:title,desc:desc,tags:tags,github:github,status:status,authorId:currentUser.uid,authorName:currentUser.displayName||currentUser.email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  showToast('Project submitted! \u2713');toggleProjectForm();
+  ['proj-title','proj-desc','proj-tags','proj-github'].forEach(function(id){document.getElementById(id).value=''});
+  loadProjects();
+}
+
+async function loadProjects(){
+  var snap=await db.collection('projects').orderBy('createdAt','desc').limit(20).get();
+  var grid=document.getElementById('ds-grid'),ph=document.getElementById('proj-placeholder');
+  grid.querySelectorAll('.live-proj').forEach(function(el){el.remove()});
+  var sm={wip:'In Progress',active:'Active',complete:'Complete',seeking:'Seeking Data'};
+  var sc={wip:'status-wip',active:'status-active',complete:'status-complete',seeking:'status-seeking'};
+  var addCard=grid.lastElementChild;
+  snap.forEach(function(doc){
+    if(ph)ph.style.display='none';
+    var d=doc.data(),card=document.createElement('div');card.className='ds-card live-proj fade-up';
+    var tagHtml=(d.tags||[]).map(function(t){return '<span class="ds-tag">'+t+'</span>'}).join('');
+    var ghLink=d.github?'<a href="'+d.github+'" target="_blank" class="ds-link github">GitHub &#x2197;</a>':'';
+    card.innerHTML='<div class="ds-card-header"><div><h3 style="font-family:var(--serif);font-size:1.05rem;line-height:1.3">'+d.title+'</h3><p class="ds-author">'+(d.authorName||'Community')+' &middot; '+timeAgo(d.createdAt)+'</p></div><span class="ds-status '+(sc[d.status]||'status-wip')+'">'+(sm[d.status]||'In Progress')+'</span></div><p class="ds-desc">'+d.desc+'</p>'+(tagHtml?'<div class="ds-stack">'+tagHtml+'</div>':'')+'<div class="ds-footer"><span style="font-size:.72rem;color:var(--ink3);font-family:var(--mono)">Community project</span><div class="ds-links">'+ghLink+'<a href="#forum" class="ds-link">Discuss &#x2197;</a></div></div>';
+    grid.insertBefore(card,addCard);
+  });
+}
+loadProjects();
+
+function copyLink(postId){navigator.clipboard.writeText(window.location.href.split('#')[0]+'#pc-'+postId).then(function(){showToast('Link copied!')}).catch(function(){showToast('Could not copy link.')})}
+function savePost(){showToast('Save feature coming soon!')}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2800)}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeThread()});
+loadPosts();
+</script>
+</body>
+</html>
